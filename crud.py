@@ -1,4 +1,4 @@
- . import models, schemas
+from . import models, schemas
 from sqlalchemy.orm import Session
 
 def create_employee(db: Session, emp: schemas.EmployeeCreate):
