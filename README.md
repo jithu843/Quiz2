@@ -7,8 +7,7 @@ This project is a 3-hour backend challenge to simulate employee data, store it i
 ## Setup Instructions
 
 1. **Clone Repo**
-git clone <your_repo_url>
-cd employee_project
+git clone <https://github.com/jithu843/Quiz2>
 
 2. Install Dependencies
 pip install -r requirements.txt
