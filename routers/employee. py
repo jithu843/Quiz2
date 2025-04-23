@@ -1,0 +1,34 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from ..database import SessionLocal, engine
+from .. import crud, models, schemas
+import faker
+
+router = APIRouter()
+models.Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.post("/generate/")
+def generate_employees(n: int = 5, db: Session = Depends(get_db)):
+    fake = faker.Faker()
+    for _ in range(n):
+        emp = schemas.EmployeeCreate(
+            name=fake.name(),
+            age=fake.random_int(22, 60),
+            department=fake.job().split()[0],
+            position=fake.job(),
+            salary=round(fake.random_number(digits=5), 2),
+            performance_score=round(fake.random.uniform(1.0, 5.0), 2)
+        )
+        crud.create_employee(db, emp)
+    return {"message": f"{n} employees created"}
+
+@router.get("/employees/", response_model=list[schemas.EmployeeRead])
+def read_employees(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return crud.get_employees(db, skip, limit)
