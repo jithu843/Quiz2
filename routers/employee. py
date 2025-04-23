@@ -55,3 +55,14 @@ def performance_chart(db: Session = Depends(get_db)):
 @router.get("/health", tags=["Health"])
 def health_check():
     return {"status": "ok"}
+
+@router.get("/employees/export", tags=["Employee"])
+def export_employees(db: Session = Depends(get_db)):
+    employees = crud.get_employees(db)
+    stream = StringIO()
+    writer = csv.writer(stream)
+    writer.writerow(["id", "name", "email", "department", "salary", "date_of_joining", "performance_score"])
+    for emp in employees:
+        writer.writerow([emp.id, emp.name, emp.email, emp.department, emp.salary, emp.date_of_joining, emp.performance_score])
+    stream.seek(0)
+    return StreamingResponse(stream, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=employees.csv"})
